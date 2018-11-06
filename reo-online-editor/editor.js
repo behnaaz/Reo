@@ -6,12 +6,12 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   monaco.languages.setLanguageConfiguration('reo', reoIMonarchLanguage.conf);
   var codeEditor = monaco.editor.create(document.getElementById('text'), {language: 'reo'});
 
-  async function sourceLoader(fname) {
+  async function sourceLoader(fileName) {
     return new Promise(function (resolve, reject) {
       let client = new XMLHttpRequest();
       // tell the client that we do not expect XML as response
       client.overrideMimeType("text/plain");
-      client.open('GET', fname);
+      client.open('GET', fileName);
       client.onreadystatechange = function () {
         if (this.readyState === 4)
           return this.status === 200 ? resolve(this.responseText) : reject(`Error returned with status ${this.status}: ${this.statusText}`)
@@ -19,6 +19,8 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       client.send()
     })
   }
+  var listener = new ReoInterpreter.ReoListener(sourceLoader);
+  listener.includeSource('compiler/default.treo');
 
   // Initialize graphical editor
   var c = document.getElementById("c"), container = document.getElementById("canvas");
@@ -151,14 +153,10 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   };
 
   document.getElementById("submit").onclick = async function () {
-    let network = new ReoNetwork(sourceLoader);
-    await network.includeSource("default.treo");
-    await network.parseComponent(codeEditor.getValue().replace(/\n/g, ''));
-
+    ReoInterpreter.parse(codeEditor.getValue(), listener);
     try {
-      // TODO generate positions if there were no geometry metadata comments
       clearAll();
-      eval(await network.generateCode())
+      eval(listener.generateCode())
     } catch (e) {
       console.log(e);
       alert(e)
