@@ -49,7 +49,7 @@ h2 {
   position: absolute;
   left: 30vw;
   top: 10vh;
-  width: 58vw;
+  width: 57vw;
   height: 90vh;
   background-color: #eee;
 }
@@ -57,9 +57,9 @@ h2 {
 #toolbar {
   display: block;
   position: absolute;
-  left: 88vw;
+  left: 87vw;
   top: 10vh;
-  width: 12vw;
+  width: 13vw;
   height: 90vh;
   padding: 0.5vw;
   border-radius: 0.5vw 0 0 0.5vw;
