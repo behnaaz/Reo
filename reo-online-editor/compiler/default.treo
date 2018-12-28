@@ -1,13 +1,13 @@
 /*!
-shape(sync(a; b)): {createChannel('sync',#posa,#posb)},
+shape(sync(a; b)): {createChannel ('sync',#posa,#posb)},
 
-shape(fifo1(a; b)): {createChannel('fifo1',#posa,#posb)},
+shape(fifo1(a; b)): {createChannel ('fifo1',#posa,#posb)},
 
-shape(syncdrain(a; b)): {createChannel('syncdrain',#posa,#posb)},
+shape(syncdrain(a; b)): {createChannel ('syncdrain',#posa,#posb)},
 
-shape(lossysync(a; b)): {createChannel('lossysync',#posa,#posb)},
+shape(lossysync(a; b)): {createChannel ('lossysync',#posa,#posb)},
 
-shape(syncspout(a; b)): {createChannel('syncspout',#posa,#posb)},
+shape(syncspout(a; b)): {createChannel ('syncspout',#posa,#posb)},
 
 shape(xor(a; b, c)): {},
 
