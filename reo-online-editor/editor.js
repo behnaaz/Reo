@@ -123,7 +123,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         fill: 'transparent',
         selectable:  mode === 'select',
         hoverCursor: mode === 'select' ? 'pointer' : 'default'
-      })
+      });
     canvas.requestRenderAll()
   }
 
@@ -145,7 +145,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     a.click()
   };
 
-  document.getElementById("downloadReo").onclick = function () {
+  document.getElementById("downloadTreo").onclick = function () {
     var a = document.getElementById("download");
     a.download = "reo.reo";
     a.href = window.URL.createObjectURL(new Blob([codeEditor.getValue()], {type: "text/plain"}));
@@ -369,7 +369,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     fabric.util.enlivenObjects(channel.parts, function(objects) {
       channel.parts = objects;
       completeChannelCreation(channel, node1, node2, manual)
-    });
+    })
   } //createChannel
 
   function completeChannelCreation(channel, node1, node2, manual) {
@@ -399,34 +399,34 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
 
     // ...a delete button...
     fabric.Image.fromURL('img/delete.svg', function(img) {
-        var scale = (nodeFactor * 4) / img.height;
-        img.scale(scale).set({
-          left: left,
-          top: top + 15,
-          class: 'delete',
-          parent: channel,
-          hasBorders: false,
-          hasControls: false,
-          visible: false,
-          baseAngle: 90,
-          baseScaleX: scale,
-          baseScaleY: scale,
-          referenceAngle: 180,
-          referenceDistance: 15,
-          referencePoint: 'middle',
-          rotate: false,
-          scale: false,
-          hoverCursor: 'pointer'
-        });
-
-        // Wait until the image is loaded to create the relationship and add it to the channel
-        var invertedBossTransform = fabric.util.invertTransform(channel.parts[0].calcTransformMatrix());
-        img.relationship = fabric.util.multiplyTransformMatrices(invertedBossTransform, img.calcTransformMatrix());
-        channel.parts.push(img);
-        channel.parts[0].set('delete', img);
-        channel.delete = img;
-        canvas.add(img)
+      var scale = (nodeFactor * 4) / img.height;
+      img.scale(scale).set({
+        left: left,
+        top: top + 15,
+        class: 'delete',
+        parent: channel,
+        hasBorders: false,
+        hasControls: false,
+        visible: false,
+        baseAngle: 90,
+        baseScaleX: scale,
+        baseScaleY: scale,
+        referenceAngle: 180,
+        referenceDistance: 15,
+        referencePoint: 'middle',
+        rotate: false,
+        scale: false,
+        hoverCursor: 'pointer'
       });
+
+      // Wait until the image is loaded to create the relationship and add it to the channel
+      var invertedBossTransform = fabric.util.invertTransform(channel.parts[0].calcTransformMatrix());
+      img.relationship = fabric.util.multiplyTransformMatrices(invertedBossTransform, img.calcTransformMatrix());
+      channel.parts.push(img);
+      channel.parts[0].set('delete', img);
+      channel.delete = img;
+      canvas.add(img)
+    });
 
     // ...two nodes...
     channel.node1 = createNode(node1.x, node1.y, node1.name, manual);
@@ -794,8 +794,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
               isBoundaryNode(node2) &&
               node1.parent !== node2.parent
              )
-        )
-          textMainScope += spaceScope + obj.generateCode(commentSwitch) + '\n'
+        ) textMainScope += spaceScope + obj.generateCode(commentSwitch) + '\n'
       }
 
       for (q = 0; q < components.length; ++q) {
@@ -1197,7 +1196,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
           p.split.set({left: p.left + 15, top: p.top + 15}).setCoords();
         p.selection.set({left: p.left, top: p.top}).setCoords();
         for (i = 0; i < p.channels.length; ++i)
-          updateChannel(p.channels[i])
+          updateChannel(p.channels[i]);
         break;
       default:
         return
@@ -1595,7 +1594,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
           if (e.shiftKey)
             console.log("Ctrl + Shift + Z"); // redo
           else
-            console.log("Ctrl + Z"); // undo
+            console.log("Ctrl + Z") // undo
         }
     }
   });
@@ -1619,7 +1618,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       originY: 'top',
       hasRotatingPoint: false,
       selectable: mode === 'select',
-      size: width * height,
+      area: width * height,
       class: 'component',
       status: manual ? 'drawing' : 'design',
       nodes: [],
@@ -1649,7 +1648,6 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     });
 
     component.set({label: label, header: header});
-    canvas.add(component, header, label);
 
     if (name !== 'main') {
       fabric.Image.fromURL('img/delete.svg', function(img) {
@@ -1735,6 +1733,8 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     canvas.setActiveObject(component);
     component.set('index', components.length);
     components.push(component);
+    canvas.add(component, header, label);
+    canvas.setActiveObject(component);
     return component
   }
 
