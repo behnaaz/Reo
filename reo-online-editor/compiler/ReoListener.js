@@ -1,202 +1,85 @@
 // Generated from Reo.g4 by ANTLR 4.7.1
 // jshint ignore: start
-var antlr4 = require('antlr4');
-const utils = require('./Utils');
-var parseNumberArray = utils.parseNumberArray, generateShapeDefinition = utils.generateShapeDefinition;
-module.exports.ReoListener = ReoListener;
-
+var antlr4 = require('antlr4/index');
 
 // This class defines a complete listener for a parse tree produced by ReoParser.
-function ReoListener(sourceLoader) {
+function ReoListener() {
   antlr4.tree.ParseTreeListener.call(this);
-  this.sourceLoader = sourceLoader;
-  this.componentDefinitions = {};
-  this.imports = new Set();
-  this.sections = {};
-  this.componentNames = {};
-  this.components = {};
-  this.ports = {};
-  this.code = "";
   return this
 }
 
 ReoListener.prototype = Object.create(antlr4.tree.ParseTreeListener.prototype);
 ReoListener.prototype.constructor = ReoListener;
 
-ReoListener.prototype.includeSource = async function (filename) {
-  this.extractMetadata(await this.sourceLoader(filename))
-};
-
-ReoListener.prototype.extractMetadata = function(str) {
-  let m2 = /^\s*\/\*!(.*?)!\*\//g.exec(str.replace(/[\n\r]/g, ''));
-  if (m2) {
-    let mstr = m2[1].trim();
-    // convert back to json
-    // convert block type to json valid string, replace : with ` because regex isn't powerful enough for this
-    mstr = mstr.replace(/{(({(({(({.*?}|.)*?)}|.)*?)}|.)*?)}/g, (m, a, s) => JSON.stringify(a.replace(/:/g, '`')));
-    // stringify keys, replace ` back for :
-    let fixedstr = "{" + mstr.replace(/([a-z][^\s,()]*|[a-z]+\(.*?\)):/g, '"$1":').replace(/`/g, ':') + "}";
-
-    let mdata = JSON.parse(fixedstr);
-    for (let metakey in mdata) {
-      let m3 = /^(\w+)(\((.*?)\))?$/g.exec(metakey);
-      if (!m3) throw 'failed to parse meta key';
-      this.processMetadata({key: m3[1], keyarg: m3[3], value: mdata[metakey]})
-    }
-  }
-};
-
-ReoListener.prototype.processMetadata = function(s, env) {
-  switch (s.key) {
-    case 'pos':
-      // let wpname = this.genNodeName(s.keyarg, env);
-      let wpname = s.keyarg;
-      let coord = parseNumberArray(s.value, env);
-      this.ports[wpname] = coord;
-      // this.waypoints[wpname] = coord;
-      break;
-    // case 'bound':
-    //   this.bound = [parseNumberArray(s.value[0], env), parseNumberArray(s.value[1], env)];
-    //   break;
-    // case 'spacing':
-    //   this.drawNodeSpacing = s.value;
-    //   break;
-    // case 'label':
-    //   this.labels[this.genNodeName(s.keyarg, env)] = s.value;
-    //   break;
-    // default:
-    //   await this.network.processMeta(s, env);
-    case 'shape':
-      let m = /^([a-zA-Z]\w+)\((.*?)\)/g.exec(s.keyarg);
-      let cname = m[1];
-      let args = m[2].replace(';', ',').split(',').map(x => x.trim()).filter(x => x.length > 0);
-      this.componentDefinitions[cname] = generateShapeDefinition(cname, args, s.value.trim());
-      break;
-    case 'include':
-      this.includeSource(s.value);
-      break;
-    default:
-      throw "unknown metakey " + s.key
-  }
-};
-
-ReoListener.prototype.draw = function (component) {
-  let output = '';
-  let definition = this.componentDefinitions[component.name];
-  if (definition.type === 'atom') {
-    if (!definition.isDefined) {
-      output += definition.define();
-      definition.isDefined = true
-    }
-    output += definition.draw(component.ports, this.ports)
-  } else {
-    output += `createComponent(${this.ports[component.name].join(',')},"${component.name}");\n`;
-    for (let c of definition.components)
-      output += this.draw(c)
-  }
-  return output
-};
-
-ReoListener.prototype.generateCode = function () {
-  this.ports.main = ['25,25,container.clientWidth-25,container.clientHeight-25'];
-  if (this.code === '')
-    this.code = `main = ${this.draw(this.componentDefinitions.main)}`;
-  return this.code
-};
-
-// Enter a parse tree produced by ReoParser#file. TODO
+// Enter a parse tree produced by ReoParser#file.
 ReoListener.prototype.enterFile = function (ctx) {
-  // console.log('enterFile')
 };
 
-// Exit a parse tree produced by ReoParser#file. TODO
+// Exit a parse tree produced by ReoParser#file.
 ReoListener.prototype.exitFile = function (ctx) {
-  // console.log('exitFile')
 };
 
 
-// Enter a parse tree produced by ReoParser#secn. TODO
+// Enter a parse tree produced by ReoParser#secn.
 ReoListener.prototype.enterSecn = function (ctx) {
-  // console.log('enterSecn')
 };
 
 // Exit a parse tree produced by ReoParser#secn.
 ReoListener.prototype.exitSecn = function (ctx) {
-  // console.log('exitSecn')
-  // this.sections[ctx] = ctx.name().getText()
 };
 
 
-// Enter a parse tree produced by ReoParser#imps. TODO
+// Enter a parse tree produced by ReoParser#imps.
 ReoListener.prototype.enterImps = function (ctx) {
-  console.log('enterImps')
 };
 
 // Exit a parse tree produced by ReoParser#imps.
 ReoListener.prototype.exitImps = function (ctx) {
-  console.log('exitImps')
 };
 
 
 // Enter a parse tree produced by ReoParser#defn.
 ReoListener.prototype.enterDefn = function (ctx) {
-  console.log('enterDefn');
-  let name = ctx.ID().getText();
-  this.componentNames[ctx.component()] = name;
-  this.componentDefinitions[ctx.ID().getText()] = {name: name}
 };
 
-// Exit a parse tree produced by ReoParser#defn. TODO
+// Exit a parse tree produced by ReoParser#defn.
 ReoListener.prototype.exitDefn = function (ctx) {
-  console.log('exitDefn')
 };
 
 
-// Enter a parse tree produced by ReoParser#component_variable. TODO
+// Enter a parse tree produced by ReoParser#component_variable.
 ReoListener.prototype.enterComponent_variable = function (ctx) {
-  console.log('enterComponent_variable');
 };
 
-// Exit a parse tree produced by ReoParser#component_variable. TODO
+// Exit a parse tree produced by ReoParser#component_variable.
 ReoListener.prototype.exitComponent_variable = function (ctx) {
-  console.log('exitComponent_variable')
 };
 
 
-// Enter a parse tree produced by ReoParser#component_atomic. TODO
+// Enter a parse tree produced by ReoParser#component_atomic.
 ReoListener.prototype.enterComponent_atomic = function (ctx) {
-  console.log('enterComponent_atomic')
 };
 
-// Exit a parse tree produced by ReoParser#component_atomic. TODO
+// Exit a parse tree produced by ReoParser#component_atomic.
 ReoListener.prototype.exitComponent_atomic = function (ctx) {
-  console.log('exitComponent_atomic')
 };
 
 
 // Enter a parse tree produced by ReoParser#component_composite.
 ReoListener.prototype.enterComponent_composite = function (ctx) {
-  console.log('enterComponent_composite');
-  console.log('sign:', ctx.sign().getText());  // TODO
-  console.log('multiset:', ctx.multiset().getText());
-  // this.components[ctx] = ctx.sign();
-  this.componentNames[ctx.multiset()] = this.componentNames[ctx];
 };
 
 // Exit a parse tree produced by ReoParser#component_composite.
 ReoListener.prototype.exitComponent_composite = function (ctx) {
-  console.log('exitComponent_composite')
 };
 
 
 // Enter a parse tree produced by ReoParser#atom.
 ReoListener.prototype.enterAtom = function (ctx) {
-  console.log('enterAtom')
 };
 
 // Exit a parse tree produced by ReoParser#atom.
 ReoListener.prototype.exitAtom = function (ctx) {
-  console.log('exitAtom')
 };
 
 
@@ -238,45 +121,27 @@ ReoListener.prototype.exitRef_c = function (ctx) {
 
 // Enter a parse tree produced by ReoParser#multiset_constraint.
 ReoListener.prototype.enterMultiset_constraint = function (ctx) {
-  console.log('enterMultiset_constraint');
-  // console.log('instance:', ctx.instance().getText());
-  console.log(ctx.getText());
-  this.componentNames[ctx.instance()] = this.componentNames[ctx];
 };
 
 // Exit a parse tree produced by ReoParser#multiset_constraint.
 ReoListener.prototype.exitMultiset_constraint = function (ctx) {
-  let metadata_token = ctx.META_COMM();
-  if (metadata_token)
-    this.extractMetadata(metadata_token.getText());
-  console.log('exitMultiset_constraint')
 };
 
 
 // Enter a parse tree produced by ReoParser#multiset_setbuilder.
 ReoListener.prototype.enterMultiset_setbuilder = function (ctx) {
-  console.log('enterMultiset_setbuilder');
-  console.log(ctx.getText());
-  for (let multiset of ctx.multiset())
-    this.componentNames[multiset] = this.componentNames[ctx];
-  this.componentDefinitions[this.componentNames[ctx]].components = []
-  // console.log('name:', this.componentNames[ctx]);
-  // console.log('multiset:', ctx.multiset()[0].getText());
-  // console.log('multiset:', ctx.multiset()[1].getText());
 };
 
 // Exit a parse tree produced by ReoParser#multiset_setbuilder.
 ReoListener.prototype.exitMultiset_setbuilder = function (ctx) {
-  console.log('exitMultiset_setbuilder')
 };
 
 
-// Enter a parse tree produced by ReoParser#multiset_iteration. TODO
+// Enter a parse tree produced by ReoParser#multiset_iteration.
 ReoListener.prototype.enterMultiset_iteration = function (ctx) {
-  console.log('enterMultiset_iteration')
 };
 
-// Exit a parse tree produced by ReoParser#multiset_iteration. TODO
+// Exit a parse tree produced by ReoParser#multiset_iteration.
 ReoListener.prototype.exitMultiset_iteration = function (ctx) {
 };
 
@@ -301,13 +166,19 @@ ReoListener.prototype.exitInstance_product = function (ctx) {
 
 // Enter a parse tree produced by ReoParser#instance_atomic.
 ReoListener.prototype.enterInstance_atomic = function (ctx) {
-  console.log('enterInstance_atomic');
-  this.componentNames[ctx.ports()] = this.componentNames[ctx];
-  this.componentDefinitions[this.componentNames[ctx]].components.push({name: ctx.component().getText()})
 };
 
 // Exit a parse tree produced by ReoParser#instance_atomic.
 ReoListener.prototype.exitInstance_atomic = function (ctx) {
+};
+
+
+// Enter a parse tree produced by ReoParser#instance_comment.
+ReoListener.prototype.enterInstance_comment = function (ctx) {
+};
+
+// Exit a parse tree produced by ReoParser#instance_comment.
+ReoListener.prototype.exitInstance_comment = function (ctx) {
 };
 
 
@@ -682,15 +553,6 @@ ReoListener.prototype.exitType = function (ctx) {
 
 // Enter a parse tree produced by ReoParser#ports.
 ReoListener.prototype.enterPorts = function (ctx) {
-  console.log('enterPorts');
-  let ports = [];
-  for (let port of ctx.port()) {
-    this.ports[port.getText()] = [];
-    ports.push(port.getText());
-  }
-
-  let component = this.componentDefinitions[this.componentNames[ctx]].components;
-  component[component.length - 1].ports = ports
 };
 
 // Exit a parse tree produced by ReoParser#ports.
@@ -700,7 +562,6 @@ ReoListener.prototype.exitPorts = function (ctx) {
 
 // Enter a parse tree produced by ReoParser#port.
 ReoListener.prototype.enterPort = function (ctx) {
-  console.log('enterPort');
 };
 
 // Exit a parse tree produced by ReoParser#port.
@@ -708,16 +569,12 @@ ReoListener.prototype.exitPort = function (ctx) {
 };
 
 
-// Enter a parse tree produced by ReoParser#r_var.
-ReoListener.prototype.enterR_var = function (ctx) {
-  console.log('enterR_var');
-  console.log(ctx.name().getText());
-  console.log(ctx.term());
+// Enter a parse tree produced by ReoParser#p_var.
+ReoListener.prototype.enterP_var = function (ctx) {
 };
 
-// Exit a parse tree produced by ReoParser#r_var.
-ReoListener.prototype.exitR_var = function (ctx) {
-  console.log('exitR_var');
+// Exit a parse tree produced by ReoParser#p_var.
+ReoListener.prototype.exitP_var = function (ctx) {
 };
 
 
@@ -1279,33 +1136,6 @@ ReoListener.prototype.exitP_function = function (ctx) {
 };
 
 
-// Enter a parse tree produced by ReoParser#p_var_port.
-ReoListener.prototype.enterP_var_port = function (ctx) {
-};
-
-// Exit a parse tree produced by ReoParser#p_var_port.
-ReoListener.prototype.exitP_var_port = function (ctx) {
-};
-
-
-// Enter a parse tree produced by ReoParser#p_var_curr.
-ReoListener.prototype.enterP_var_curr = function (ctx) {
-};
-
-// Exit a parse tree produced by ReoParser#p_var_curr.
-ReoListener.prototype.exitP_var_curr = function (ctx) {
-};
-
-
-// Enter a parse tree produced by ReoParser#p_var_next.
-ReoListener.prototype.enterP_var_next = function (ctx) {
-};
-
-// Exit a parse tree produced by ReoParser#p_var_next.
-ReoListener.prototype.exitP_var_next = function (ctx) {
-};
-
-
 // Enter a parse tree produced by ReoParser#pr.
 ReoListener.prototype.enterPr = function (ctx) {
 };
@@ -1574,3 +1404,14 @@ ReoListener.prototype.enterRba_null_ctxt = function (ctx) {
 // Exit a parse tree produced by ReoParser#rba_null_ctxt.
 ReoListener.prototype.exitRba_null_ctxt = function (ctx) {
 };
+
+
+// Enter a parse tree produced by ReoParser#comment.
+ReoListener.prototype.enterComment = function (ctx) {
+};
+
+// Exit a parse tree produced by ReoParser#comment.
+ReoListener.prototype.exitComment = function (ctx) {
+};
+
+exports.ReoListener = ReoListener;

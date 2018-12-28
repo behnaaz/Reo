@@ -19,7 +19,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       client.send()
     })
   }
-  var listener = new ReoInterpreter.ReoListener(sourceLoader);
+  var listener = new ReoInterpreter.ReoListenerImpl(sourceLoader);
   listener.includeSource('compiler/default.treo');
 
   // Initialize graphical editor
@@ -153,9 +153,10 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   };
 
   document.getElementById("submit").onclick = async function () {
-    ReoInterpreter.parse(codeEditor.getValue(), listener);
+    ReoInterpreter.parse(codeEditor.getValue(), listener);  // FIXME code should not be collected from editor
     try {
       clearAll();
+      // console.log(listener.generateCode());
       eval(listener.generateCode())
     } catch (e) {
       console.log(e);
@@ -895,14 +896,17 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   }); //object:moving
 
   canvas.on('object:added', function() {
+    listener.clearCache();
     updateText()
   }); //object:added
 
   canvas.on('object:removed', function() {
+    listener.clearCache();
     updateText()
   }); //object:removed
 
   canvas.on('text:changed', function() {
+    listener.clearCache();
     updateText()
   }); //text:editing:exited
 
